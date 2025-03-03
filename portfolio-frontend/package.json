@@ -24,10 +24,9 @@
   },
   "scripts": {
     "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
     "test": "react-app-rewired test",
-    "eject": "react-scripts eject",
-    "build": "react-scripts build && npm run optimize",
-    "optimize": "workbox generateSW webpack.config.js"
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
@@ -54,5 +53,8 @@
     "react-app-rewired": "^2.2.1",
     "tailwindcss": "^3.4.3",
     "workbox-webpack-plugin": "^6.6.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

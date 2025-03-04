@@ -1,17 +1,21 @@
 import React from 'react';
 
-interface ProjectProps {
+interface Project {
   name: string;
   description: string;
   html_url: string;
 }
 
-const ProjectCard: React.FC<ProjectProps> = ({ name, description, html_url }) => {
+interface ProjectProps {
+  project: Project;
+}
+
+const ProjectCard: React.FC<ProjectProps> = ({ project }) => {
   return (
     <div className="project-card">
-      <h3>{name}</h3>
-      <p>{description || 'No description available'}</p>
-      <a href={html_url} target="_blank" rel="noopener noreferrer">
+      <h3>{project.name}</h3>
+      <p>{project.description || 'No description available'}</p>
+      <a href={project.html_url} target="_blank" rel="noopener noreferrer">
         View on GitHub
       </a>
     </div>

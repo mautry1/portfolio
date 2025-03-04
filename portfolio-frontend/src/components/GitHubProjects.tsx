@@ -13,7 +13,6 @@ const GitHubProjects: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Replace 'mautry1' with your GitHub username if different
     fetch('https://api.github.com/users/mautry1/repos')
       .then((response) => response.json())
       .then((data) => {
@@ -35,9 +34,11 @@ const GitHubProjects: React.FC = () => {
       {repos.map((repo) => (
         <ProjectCard
           key={repo.id}
-          name={repo.name}
-          description={repo.description}
-          html_url={repo.html_url}
+          project={{ // Pass as a single project object
+            name: repo.name,
+            description: repo.description,
+            html_url: repo.html_url
+          }}
         />
       ))}
     </div>

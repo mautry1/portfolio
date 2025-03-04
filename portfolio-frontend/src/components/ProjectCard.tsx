@@ -5,6 +5,8 @@ interface Project {
   name: string;
   description: string;
   html_url: string;
+  techStack?: string[];
+  liveDemoLink?: string;
 }
 
 interface ProjectProps {

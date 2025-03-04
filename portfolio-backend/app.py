@@ -24,7 +24,7 @@ db = client.portfolio
 projects_collection = db.projects
 
 # Enable CORS
-CORS(app, resources={r"/api/*": {"origins": os.getenv('ALLOWED_ORIGINS', '*')}})
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # JSON serializer for MongoDB ObjectId
 def json_response(data):
@@ -40,8 +40,9 @@ def internal_error(error):
     return jsonify({'error': 'Internal server error'}), 500
 
 # API Routes
-@app.route('/api/projects', methods=['GET'])
-def get_projects():
+@app.route('/projects', methods=['GET'])
+def projects_redirect():
+    return json_response({'message': 'Use /api/projects endpoint'}), 200
     try:
         projects = list(projects_collection.find().sort('createdAt', -1))
         return json_response({'projects': projects})

@@ -1,26 +1,19 @@
 import React from 'react';
-import { AcademicCapIcon } from '@heroicons/react/solid'; // Example icon
 
-interface Repo {
+interface ProjectProps {
   name: string;
   description: string;
   html_url: string;
 }
 
-interface ProjectCardProps {
-  repo: Repo;
-}
-
-const ProjectCard: React.FC<ProjectCardProps> = ({ repo }) => {
+const ProjectCard: React.FC<ProjectProps> = ({ name, description, html_url }) => {
   return (
     <div className="project-card">
-      <h3>{repo.name}</h3>
-      <p>{repo.description || 'No description available'}</p>
-      <a href={repo.html_url} target="_blank" rel="noopener noreferrer">
+      <h3>{name}</h3>
+      <p>{description || 'No description available'}</p>
+      <a href={html_url} target="_blank" rel="noopener noreferrer">
         View on GitHub
       </a>
-      {/* Example usage of a Heroicon */}
-      <AcademicCapIcon className="h-5 w-5 text-blue-500" />
     </div>
   );
 };

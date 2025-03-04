@@ -40,9 +40,8 @@ def internal_error(error):
     return jsonify({'error': 'Internal server error'}), 500
 
 # API Routes
-@app.route('/projects', methods=['GET'])
-def projects_redirect():
-    return json_response({'message': 'Use /api/projects endpoint'}), 200
+@app.route('/api/projects', methods=['GET'])
+def get_projects():
     try:
         projects = list(projects_collection.find().sort('createdAt', -1))
         return json_response({'projects': projects})

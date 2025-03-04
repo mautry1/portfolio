@@ -1,7 +1,14 @@
 import { useState, useEffect } from "react";
 import { fetchProjects } from "../api";
-import { Project } from "../types/types";
 import ProjectCard from "../components/ProjectCard";
+
+interface Project {
+  _id: string;
+  title: string;
+  description: string;
+  githubLink: string;
+  techStack?: string[];
+}
 
 const Projects = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -15,6 +22,7 @@ const Projects = () => {
         setProjects(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load projects");
+        console.error('API Error:', err);
       } finally {
         setLoading(false);
       }

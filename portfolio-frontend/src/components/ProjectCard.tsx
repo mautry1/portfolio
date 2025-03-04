@@ -1,36 +1,27 @@
-import { motion } from "framer-motion";
-import { Project } from "../types/types";
+import React from 'react';
+import { AcademicCapIcon } from '@heroicons/react/solid'; // Example icon
 
-const ProjectCard = ({ project }: { project: Project }) => {
+interface Repo {
+  name: string;
+  description: string;
+  html_url: string;
+}
+
+interface ProjectCardProps {
+  repo: Repo;
+}
+
+const ProjectCard: React.FC<ProjectCardProps> = ({ repo }) => {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6"
-    >
-      <img
-        src={project.image}
-        alt={project.title}
-        className="w-full h-48 object-cover rounded-lg"
-      />
-      <h3 className="text-xl font-bold mt-4 dark:text-white">
-        {project.title}
-      </h3>
-      <p className="text-gray-600 dark:text-gray-300 mt-2">
-        {project.description}
-      </p>
-      <div className="flex flex-wrap gap-2 mt-4">
-        {project.techStack.map((tech) => (
-          <span
-            key={tech}
-            className="px-3 py-1 text-sm bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 rounded-full"
-          >
-            {tech}
-          </span>
-        ))}
-      </div>
-    </motion.div>
+    <div className="project-card">
+      <h3>{repo.name}</h3>
+      <p>{repo.description || 'No description available'}</p>
+      <a href={repo.html_url} target="_blank" rel="noopener noreferrer">
+        View on GitHub
+      </a>
+      {/* Example usage of a Heroicon */}
+      <AcademicCapIcon className="h-5 w-5 text-blue-500" />
+    </div>
   );
 };
 

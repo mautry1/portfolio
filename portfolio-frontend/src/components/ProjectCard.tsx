@@ -1,4 +1,5 @@
 import React from 'react';
+import './ProjectCard.css';
 
 interface Project {
   name: string;

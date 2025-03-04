@@ -8,25 +8,36 @@ interface Repo {
   html_url: string;
 }
 
+// Import process.env variables
+const username = process.env.REACT_APP_GITHUB_USERNAME || 'defaultUsername';
+
 const GitHubProjects: React.FC = () => {
   const [repos, setRepos] = useState<Repo[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('https://api.github.com/users/mautry1/repos')
+    fetch(`https://api.github.com/users/${username}/repos`)
       .then((response) => response.json())
       .then((data) => {
-        setRepos(data);
+        if (Array.isArray(data)) {
+          setRepos(data);
+        } else {
+          console.error('Unexpected data structure:', data);
+        }
         setLoading(false);
       })
       .catch((error) => {
         console.error('Error fetching repos:', error);
         setLoading(false);
       });
-  }, []);
+  }, [username]);
 
   if (loading) {
     return <div>Loading...</div>;
+  }
+
+  if (!repos.length) {
+    return <div>No projects found.</div>;
   }
 
   return (

@@ -8,6 +8,8 @@ from pymongo import MongoClient
 from bson import ObjectId, json_util
 import atexit
 from apscheduler.schedulers.background import BackgroundScheduler
+from pymongo.errors import ConnectionFailure, OperationFailure
+
 
 # Load environment variables
 load_dotenv()
@@ -20,10 +22,17 @@ app.config.update(
     DEBUG=os.getenv('FLASK_ENV') == 'development'
 )
 
-# Database connection
-client = MongoClient(app.config['MONGO_URI'])
-db = client.portfolio
-projects_collection = db.projects
+# Database connection with verification
+try:
+    client = MongoClient(app.config['MONGO_URI'], serverSelectionTimeoutMS=5000)
+    client.admin.command('ping')  # Verify connection
+    db = client.portfolio
+    projects_collection = db.projects
+    print("✅ Successfully connected to MongoDB")
+except ConnectionFailure as e:
+    print(f"❌ MongoDB connection failed: {str(e)}")
+    raise RuntimeError("Database connection failed") from e
+
 
 # Enable CORS
 CORS(app, resources={r"/*": {"origins": "*"}})
@@ -46,11 +55,14 @@ def internal_error(error):
 def get_projects():
     try:
         projects = list(projects_collection.find().sort('createdAt', -1))
-        return json_response({'projects': projects})
+        return json_util.dumps({'projects': projects}), 200, {'Content-Type': 'application/json'}
     except Exception as e:
         app.logger.error(f'Database error: {str(e)}')
+        return jsonify({'error': 'Database query failed', 'code': e.code}), 500
+    except Exception as e:
+        app.logger.error(f'Unexpected error: {str(e)}')
         return jsonify({'error': 'Database operation failed'}), 500
-
+    
 @app.route('/api/projects', methods=['POST'])
 def create_project():
     try:

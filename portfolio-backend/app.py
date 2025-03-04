@@ -6,6 +6,8 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from pymongo import MongoClient
 from bson import ObjectId, json_util
+import atexit
+from apscheduler.schedulers.background import BackgroundScheduler
 
 # Load environment variables
 load_dotenv()
@@ -76,6 +78,18 @@ def create_project():
 @app.route('/health')
 def health_check():
     return jsonify({'status': 'healthy', 'timestamp': datetime.utcnow().isoformat()})
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(
+    func=lambda: projects_collection.find_one(),
+    trigger="interval",
+    minutes=3,
+    misfire_grace_time=300
+)
+scheduler.start()
+
+# Shutdown scheduler when app exits
+atexit.register(lambda: scheduler.shutdown())
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))

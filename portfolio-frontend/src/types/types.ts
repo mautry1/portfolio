@@ -1,10 +1,10 @@
+// types.ts
 export interface Project {
-    _id: string;
-    title: string;
-    description: string;
-    techStack: string[];
-    githubLink: string;
-    liveDemoLink?: string;
-    image?: string;
-    createdAt: Date;
+  _id: string;
+  title: string;
+  description: string;
+  githubLink: string;
+  techStack?: string[];
+  liveDemoLink?: string;
+  createdAt?: Date;
 }

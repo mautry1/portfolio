@@ -8,6 +8,7 @@ interface Project {
   description: string;
   githubLink: string;
   techStack?: string[];
+  liveDemoLink?: string;
 }
 
 const Projects = () => {
@@ -31,28 +32,46 @@ const Projects = () => {
   }, []);
 
   if (loading) {
-    return <div className="p-8 text-center">Loading projects...</div>;
+    return (
+      <div className="p-8 text-center space-y-4">
+        <div className="animate-spin text-4xl">⏳</div>
+        <p className="text-lg">Loading projects...</p>
+        <p className="text-sm text-gray-500">
+          This might take up to 1 minute on first load (Render free tier)
+        </p>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="p-8 text-red-500">Error: {error}</div>;
+    return (
+      <div className="p-8 text-center">
+        <div className="text-red-500 mb-4 text-lg">⚠️ {error}</div>
+        <button 
+          onClick={() => window.location.reload()}
+          className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+        >
+          Try Again
+        </button>
+      </div>
+    );
   }
 
   if (!projects.length) {
-    return <div className="p-8">No projects found.</div>;
+    return <div className="p-8 text-center">No projects found.</div>;
   }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-8">
       {projects.map((project) => (
         <ProjectCard 
-          key={project._id} 
+          key={project._id}
           project={{
-            // Map backend fields to frontend expectations
-            name: project.title,       // Convert 'title' to 'name'
+            name: project.title,
             description: project.description,
-            html_url: project.githubLink,  // Convert 'githubLink' to 'html_url'
-            // Add other necessary mappings
+            html_url: project.githubLink,
+            techStack: project.techStack,
+            liveDemoLink: project.liveDemoLink
           }}
         />
       ))}

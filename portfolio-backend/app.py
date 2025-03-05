@@ -2,6 +2,8 @@
 import os
 import atexit
 import smtplib
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from email.mime.text import MIMEText
 from email.utils import formatdate
 from datetime import datetime
@@ -23,6 +25,13 @@ app.config.update(
     SECRET_KEY=os.getenv('SECRET_KEY', 'fallback-secret-key'),
     MONGO_URI=os.getenv('MONGO_URI'),
     DEBUG=os.getenv('FLASK_ENV') == 'development'
+)
+
+limiter = Limiter(
+    app=app,
+    key_func=get_remote_address,  # More reliable than lambda
+    storage_uri="memory://",
+    default_limits=["200 per day", "50 per hour"]
 )
 
 # Database connection with verification

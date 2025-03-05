@@ -6,7 +6,7 @@ const Navbar = () => {
   const [isDark, setIsDark] = useState(false);
 
   return (
-    <nav className="bg-white dark:bg-gray-800 shadow-lg">
+    <nav className="bg-white dark:bg-gray-800 shadow-lg glass-effect fixed w-full top-0 z-50 backdrop-blur-xl border-b border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">

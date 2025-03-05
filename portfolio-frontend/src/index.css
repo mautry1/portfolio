@@ -9,27 +9,16 @@
 }
 
 body {
-  @apply bg-black min-h-screen;
+  @apply bg-black min-h-screen; /* Simplified to solid black for lattice visibility */
   font-family: 'Inter', sans-serif;
   overflow-x: hidden;
   position: relative;
 }
 
 h1, h2, h3 {
-  font-family: 'Orbitron', sans-serif; /* Optional: change to 'Inter' for full minimalism */
+  font-family: 'Orbitron', sans-serif;
 }
 
 .glass-effect {
   @apply backdrop-blur-sm bg-white/80 dark:bg-gray-900/80 border border-gray-200/50 dark:border-gray-700/50 rounded-xl p-6;
-}
-
-.gravity-background {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: black;
-  z-index: -1; /* Behind content */
-  pointer-events: none; /* Allows clicks to pass through */
 }

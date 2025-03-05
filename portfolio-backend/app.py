@@ -1,6 +1,9 @@
 # backend/app.py
 import os
 import atexit
+import smtplib
+from email.mime.text import MIMEText
+from email.utils import formatdate
 from datetime import datetime
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
@@ -101,6 +104,40 @@ scheduler.start()
 
 # Shutdown scheduler when app exits
 atexit.register(lambda: scheduler.shutdown())
+
+@app.route('/api/contact', methods=['POST'])
+@limiter.limit("5 per day")  # Gmail has daily limits
+def send_contact_email():
+    try:
+        data = request.get_json()
+        
+        # Add basic spam check
+        if len(data.get('message', '')) < 10:
+            return jsonify({'error': 'Message too short'}), 400
+
+        msg = MIMEText(f"""
+        Name: {data['name']}
+        Email: {data['email']}
+        Message: {data['message']}
+        """)
+        msg['Subject'] = f"New Contact from {data['name']}"
+        msg['From'] = os.getenv('SMTP_FROM')
+        msg['To'] = os.getenv('SMTP_TO')
+        msg['Date'] = formatdate(localtime=True)
+
+        with smtplib.SMTP(os.getenv('SMTP_HOST'), int(os.getenv('SMTP_PORT'))) as server:
+            server.starttls()
+            server.login(os.getenv('SMTP_USER'), os.getenv('SMTP_PASS'))
+            server.send_message(msg)
+        
+        return jsonify({'message': 'Email sent successfully'}), 200
+
+    except smtplib.SMTPAuthenticationError:
+        app.logger.error('SMTP Authentication Failed')
+        return jsonify({'error': 'Email service configuration error'}), 500
+    except Exception as e:
+        app.logger.error(f'Contact Error: {str(e)}')
+        return jsonify({'error': 'Internal server error'}), 500
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))

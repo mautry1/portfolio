@@ -17,7 +17,7 @@ const App = () => {
         {/* Content Container */}
         <div className="relative z-10">
           <Navbar />
-          <main className="pt-20"> {/* Add padding for navbar */}
+          <main className="pt-20">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/projects" element={<Projects />} />

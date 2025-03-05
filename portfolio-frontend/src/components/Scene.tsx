@@ -1,59 +1,71 @@
 import { useEffect, useRef } from 'react';
 
-interface Needle {
+interface Prism {
   element: HTMLDivElement;
   baseX: number;
   baseY: number;
+  depth: number;
 }
 
 const Scene = () => {
-  const needleContainerRef = useRef<HTMLDivElement>(null);
-  const needlesRef = useRef<Needle[]>([]);
+  const prismContainerRef = useRef<HTMLDivElement>(null);
+  const prismsRef = useRef<Prism[]>([]);
 
   useEffect(() => {
-    const numNeedles = 20; // Reduced from 100
-    const angleIncrement = (2 * Math.PI) / numNeedles;
-    const radius = 200; // Slightly reduced for balance
-    const centerX = window.innerWidth / 2;
-    const centerY = window.innerHeight / 2;
-    const needleHeight = 20; // Shorter needles
+    const numPrisms = 30; // Number of prisms (adjustable for performance)
+    const prismSize = 50; // Width and height of each prism in pixels
 
-    for (let i = 0; i < numNeedles; i++) {
-      const angle = i * angleIncrement;
-      const baseX = centerX + radius * Math.cos(angle);
-      const baseY = centerY + radius * Math.sin(angle);
-      const needle = document.createElement('div');
-      needle.className = 'needle';
-      needle.style.left = `${baseX}px`;
-      needle.style.top = `${baseY}px`;
-      needle.style.height = `${needleHeight}px`; // Apply shorter height
-      if (needleContainerRef.current) {
-        needleContainerRef.current.appendChild(needle);
+    // Create prisms and position them randomly
+    for (let i = 0; i < numPrisms; i++) {
+      const x = Math.random() * window.innerWidth;
+      const y = Math.random() * window.innerHeight;
+      const depth = Math.random() * 200 - 100; // Depth between -100 and 100px
+
+      const prism = document.createElement('div');
+      prism.className = 'prism';
+      // Center the prism at (x, y) by offsetting half its size
+      prism.style.left = `${x - prismSize / 2}px`;
+      prism.style.top = `${y - prismSize / 2}px`;
+      prism.style.width = `${prismSize}px`;
+      prism.style.height = `${prismSize}px`;
+      // Set initial 3D position
+      prism.style.transform = `translateZ(${depth}px)`;
+
+      if (prismContainerRef.current) {
+        prismContainerRef.current.appendChild(prism);
       }
-      needlesRef.current.push({ element: needle, baseX, baseY });
+      prismsRef.current.push({ element: prism, baseX: x, baseY: y, depth });
     }
 
+    // Handle cursor movement
     const handleMouseMove = (e: MouseEvent) => {
       const cursorX = e.clientX;
       const cursorY = e.clientY;
-      needlesRef.current.forEach(({ element, baseX, baseY }) => {
+      prismsRef.current.forEach(({ element, baseX, baseY, depth }) => {
+        // Calculate tilt based on cursor position
         const dx = cursorX - baseX;
         const dy = cursorY - baseY;
-        const angle = Math.atan2(dy, dx);
-        element.style.transform = `rotate(${angle}rad)`;
+        const rotateY = (dx / window.innerWidth) * 90; // Max 90° tilt on Y-axis
+        const rotateX = -(dy / window.innerHeight) * 90; // Max 90° tilt on X-axis, inverted
+        const gradientAngle = (rotateY + 45) % 360; // Gradient shifts with rotation
+
+        // Apply 3D transform and gradient
+        element.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(${depth}px)`;
+        element.style.background = `linear-gradient(${gradientAngle}deg, rgba(255,255,255,0.1), rgba(255,255,255,0.3))`;
       });
     };
 
     window.addEventListener('mousemove', handleMouseMove);
 
+    // Cleanup on unmount
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
-      needlesRef.current.forEach(({ element }) => element.remove());
-      needlesRef.current = [];
+      prismsRef.current.forEach(({ element }) => element.remove());
+      prismsRef.current = [];
     };
   }, []);
 
-  return <div ref={needleContainerRef} className="needle-background"></div>;
+  return <div ref={prismContainerRef} className="prism-background" />;
 };
 
 export default Scene;

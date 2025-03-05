@@ -9,8 +9,10 @@
 }
 
 body {
-  @apply bg-gradient-to-br from-galaxy-blue via-black to-galaxy-blue min-h-screen;
+  @apply bg-black min-h-screen; /* Updated to solid black */
   font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+  position: relative;
 }
 
 h1, h2, h3 {
@@ -36,4 +38,24 @@ h1, h2, h3 {
 
 .hover-shine:hover::after {
   transform: translateX(100%);
+}
+
+/* Needle Background Styles */
+.needle-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: black;
+  z-index: -1;
+  pointer-events: none; /* Allows clicks to pass through */
+}
+
+.needle {
+  position: absolute;
+  width: 2px;
+  height: 100px;
+  background: linear-gradient(to top, rgba(192, 192, 192, 0.2), rgba(192, 192, 192, 0.8));
+  transform-origin: bottom center;
 }

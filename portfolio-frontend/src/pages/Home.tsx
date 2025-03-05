@@ -1,9 +1,11 @@
 import { motion } from 'framer-motion';
 import { CodeBracketIcon, CommandLineIcon, CpuChipIcon } from '@heroicons/react/24/outline';
+import Scene from "../components/Scene";
 
 const Home = () => {
   return (
     <div className="relative min-h-screen flex items-center justify-center">
+      <Scene /> {/* Needle background */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}

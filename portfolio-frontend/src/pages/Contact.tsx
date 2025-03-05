@@ -1,9 +1,11 @@
 import { motion } from 'framer-motion';
 import { EnvelopeIcon, GlobeAltIcon, PhoneIcon } from '@heroicons/react/24/outline';
+import Scene from "../components/Scene";
 
 const Contact = () => {
   return (
     <div className="relative min-h-screen flex items-center justify-center">
+      <Scene /> {/* Needle background */}
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -50,8 +52,8 @@ const Contact = () => {
 
           <div className="space-y-6">
             {[
-              { icon: EnvelopeIcon, text: 'hello@example.com' },
-              { icon: PhoneIcon, text: '+1 (555) 123-4567' },
+              { icon: EnvelopeIcon, text: 'micahautry2@gmail.com' },
+              { icon: PhoneIcon, text: '+1 (801) 657-9153' },
               { icon: GlobeAltIcon, text: 'portfolio-site.com' },
             ].map((item, index) => (
               <motion.div 

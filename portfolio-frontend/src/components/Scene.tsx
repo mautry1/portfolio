@@ -26,22 +26,22 @@ const Scene = () => {
     // Initialize spheres
     const numSpheres = 5;
     const spheres = Array.from({ length: numSpheres }, () => {
-      const radius = 10 + Math.random() * 20; // Radius between 10 and 30
+      const radius = 10 + Math.random() * 20;
       return {
-        sx: Math.random() * width, // x-position
-        sy: Math.random() * height, // y-position
-        vx: (Math.random() - 0.5) * 2, // x-velocity
-        vy: (Math.random() - 0.5) * 2, // y-velocity
+        sx: Math.random() * width,
+        sy: Math.random() * height,
+        vx: (Math.random() - 0.5) * 2,
+        vy: (Math.random() - 0.5) * 2,
         radius,
-        G: radius * 10, // Gravitational constant proportional to size
+        G: radius * 10,
       };
     });
 
     // Constants
-    const epsilon = 100; // Prevent division by zero
-    const C = 10000; // Cursor gravitational constant
-    const scale = 10; // Z-displacement scale
-    const maxSpeed = 5; // Maximum sphere speed
+    const epsilon = 100;
+    const C = 10000;
+    const scale = 10;
+    const maxSpeed = 5;
 
     const draw = () => {
       context.clearRect(0, 0, width, height);
@@ -52,28 +52,28 @@ const Scene = () => {
 
       // Draw horizontal grid lines
       for (let j = 0; j <= gridRows; j++) {
-        context.beginPath();
+        const points = [];
         for (let i = 0; i <= gridCols; i++) {
           const x = i * stepX;
           const y = j * stepY;
           const z = calculateZ(x, y);
-          const screenY = y - z * scale; // Negative z moves points down
-          i === 0 ? context.moveTo(x, screenY) : context.lineTo(x, screenY);
+          const screenY = y - z * scale;
+          points.push({ x, y: screenY });
         }
-        context.stroke();
+        drawSpline(context, points);
       }
 
       // Draw vertical grid lines
       for (let i = 0; i <= gridCols; i++) {
-        context.beginPath();
+        const points = [];
         for (let j = 0; j <= gridRows; j++) {
           const x = i * stepX;
           const y = j * stepY;
           const z = calculateZ(x, y);
           const screenY = y - z * scale;
-          j === 0 ? context.moveTo(x, screenY) : context.lineTo(x, screenY);
+          points.push({ x, y: screenY });
         }
-        context.stroke();
+        drawSpline(context, points);
       }
 
       // Draw spheres
@@ -84,6 +84,28 @@ const Scene = () => {
       });
     };
 
+    const drawSpline = (ctx: CanvasRenderingContext2D, points: { x: number; y: number }[]) => {
+      if (points.length < 2) return;
+      
+      ctx.beginPath();
+      ctx.moveTo(points[0].x, points[0].y);
+
+      for (let i = 0; i < points.length - 1; i++) {
+        const p0 = i === 0 ? points[0] : points[i - 1];
+        const p1 = points[i];
+        const p2 = points[i + 1];
+        const p3 = i + 2 < points.length ? points[i + 2] : p2;
+
+        const cp1x = p1.x + (p2.x - p0.x) / 6;
+        const cp1y = p1.y + (p2.y - p0.y) / 6;
+        const cp2x = p2.x - (p3.x - p1.x) / 6;
+        const cp2y = p2.y - (p3.y - p1.y) / 6;
+
+        ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+      }
+      ctx.stroke();
+    };
+
     const update = () => {
       spheres.forEach(sphere => {
         const { cx, cy } = cursorRef.current;
@@ -91,25 +113,21 @@ const Scene = () => {
         const dy = cy - sphere.sy;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
-        // Apply attraction from cursor
         if (distance > 0) {
           const force = C / (distance * distance * distance + epsilon);
           sphere.vx += dx * force;
           sphere.vy += dy * force;
         }
 
-        // Clamp speed
         const speed = Math.sqrt(sphere.vx * sphere.vx + sphere.vy * sphere.vy);
         if (speed > maxSpeed) {
           sphere.vx = (sphere.vx / speed) * maxSpeed;
           sphere.vy = (sphere.vy / speed) * maxSpeed;
         }
 
-        // Update position
         sphere.sx += sphere.vx;
         sphere.sy += sphere.vy;
 
-        // Bounce off edges
         if (sphere.sx < 0 || sphere.sx > width) {
           sphere.vx = -sphere.vx;
           sphere.sx = Math.max(0, Math.min(width, sphere.sx));
@@ -123,14 +141,12 @@ const Scene = () => {
 
     const calculateZ = (x: number, y: number): number => {
       let z = 0;
-      // Influence from spheres
       spheres.forEach(sphere => {
         const dx = x - sphere.sx;
         const dy = y - sphere.sy;
         const distanceSq = dx * dx + dy * dy;
         z -= sphere.G / (distanceSq + epsilon);
       });
-      // Influence from cursor
       const { cx, cy } = cursorRef.current;
       const dxCursor = x - cx;
       const dyCursor = y - cy;

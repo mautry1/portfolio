@@ -57,11 +57,10 @@ def get_projects():
         projects = list(projects_collection.find().sort('createdAt', -1))
         return json_util.dumps({'projects': projects}), 200, {'Content-Type': 'application/json'}
     except Exception as e:
-        app.logger.error(f'Database error: {str(e)}')
-        return jsonify({'error': 'Database query failed', 'code': e.code}), 500
-    except Exception as e:
-        app.logger.error(f'Unexpected error: {str(e)}')
-        return jsonify({'error': 'Database operation failed'}), 500
+        app.logger.error(f'Error fetching projects: {str(e)}')
+        # Avoid referencing e.code unless you're sure the exception has it.
+        return jsonify({'error': 'Database query failed'}), 500
+
     
 @app.route('/api/projects', methods=['POST'])
 def create_project():

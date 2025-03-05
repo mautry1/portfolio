@@ -1,82 +1,86 @@
 import { useRef, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { OrbitControls } from '@react-three/drei';
 
-const CrystalLattice = () => {
-  const latticeRef = useRef<THREE.LineSegments>(null!);
-  const mouse = useRef({ x: 0, y: 0 });
+const ParticleStreams = () => {
+  const particlesRef = useRef<THREE.Points>(null!);
+  const mouse = useRef({ x: 0, y: 0, z: 0 });
 
-  // Create the lattice geometry
+  // Initialize particles
   useEffect(() => {
-    const geometry = new THREE.BufferGeometry();
-    const positions: number[] = [];
-    const gridSize = 20; // 20x20 grid
-    const spacing = 1; // Distance between points
+    const numParticles = 75; // Adjustable for density
+    const positions = new Float32Array(numParticles * 3);
+    const velocities = new Float32Array(numParticles * 3);
 
-    // Generate hexagonal lattice points
-    for (let y = -gridSize / 2; y <= gridSize / 2; y++) {
-      for (let x = -gridSize / 2; x <= gridSize / 2; x++) {
-        const offset = y % 2 === 0 ? 0 : spacing / 2; // Hexagonal offset
-        const baseX = (x + offset) * spacing;
-        const baseY = y * (spacing * Math.sqrt(3)) / 2;
-        const baseZ = 0;
-
-        // Connect to right neighbor (if exists)
-        if (x < gridSize / 2) {
-          positions.push(baseX, baseY, baseZ);
-          positions.push(baseX + spacing, baseY, baseZ);
-        }
-
-        // Connect to bottom-right neighbor (if exists)
-        if (x < gridSize / 2 && y < gridSize / 2) {
-          positions.push(baseX, baseY, baseZ);
-          positions.push(baseX + spacing / 2, baseY + (spacing * Math.sqrt(3)) / 2, baseZ);
-        }
-
-        // Connect to bottom-left neighbor (if exists)
-        if (x > -gridSize / 2 && y < gridSize / 2) {
-          positions.push(baseX, baseY, baseZ);
-          positions.push(baseX - spacing / 2, baseY + (spacing * Math.sqrt(3)) / 2, baseZ);
-        }
-      }
+    // Random initial positions and velocities
+    for (let i = 0; i < numParticles; i++) {
+      positions[i * 3] = (Math.random() - 0.5) * 20; // x: -10 to 10
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 20; // y: -10 to 10
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 10; // z: -5 to 5
+      velocities[i * 3] = (Math.random() - 0.5) * 0.05; // vx
+      velocities[i * 3 + 1] = (Math.random() - 0.5) * 0.05; // vy
+      velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.02; // vz
     }
 
-    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-    if (latticeRef.current) {
-      latticeRef.current.geometry = geometry;
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('velocity', new THREE.BufferAttribute(velocities, 3));
+
+    if (particlesRef.current) {
+      particlesRef.current.geometry = geometry;
     }
   }, []);
 
-  // Animate and deform lattice
+  // Animate particles and apply cursor influence
   useFrame(({ clock }) => {
-    const positions = latticeRef.current.geometry.attributes.position.array as Float32Array;
+    const positions = particlesRef.current.geometry.attributes.position.array as Float32Array;
+    const velocities = particlesRef.current.geometry.attributes.velocity.array as Float32Array;
     const time = clock.getElapsedTime();
 
     for (let i = 0; i < positions.length; i += 3) {
       const x = positions[i];
       const y = positions[i + 1];
-      const baseZ = Math.sin(time + x * 0.1 + y * 0.1) * 0.5; // Subtle drift
+      const z = positions[i + 2];
 
-      // Calculate cursor influence
+      // Natural drift with slight noise
+      velocities[i] += Math.sin(time + x * 0.1) * 0.001;
+      velocities[i + 1] += Math.cos(time + y * 0.1) * 0.001;
+      velocities[i + 2] += Math.sin(time + z * 0.1) * 0.0005;
+
+      // Cursor influence
       const dx = mouse.current.x - x;
       const dy = mouse.current.y - y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      const influence = Math.min(2 / (distance + 0.1), 5); // Max influence capped
+      const dz = mouse.current.z - z;
+      const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+      const force = Math.min(0.1 / (distance + 0.1), 0.05); // Gentle attraction
 
-      // Apply 3D warp toward cursor
-      positions[i + 2] = baseZ - influence;
+      velocities[i] += dx * force;
+      velocities[i + 1] += dy * force;
+      velocities[i + 2] += dz * force;
+
+      // Update positions
+      positions[i] += velocities[i];
+      positions[i + 1] += velocities[i + 1];
+      positions[i + 2] += velocities[i + 2];
+
+      // Wrap around edges (optional for continuous flow)
+      if (positions[i] > 10) positions[i] = -10;
+      if (positions[i] < -10) positions[i] = 10;
+      if (positions[i + 1] > 10) positions[i + 1] = -10;
+      if (positions[i + 1] < -10) positions[i + 1] = 10;
+      if (positions[i + 2] > 5) positions[i + 2] = -5;
+      if (positions[i + 2] < -5) positions[i + 2] = 5;
     }
 
-    latticeRef.current.geometry.attributes.position.needsUpdate = true;
+    particlesRef.current.geometry.attributes.position.needsUpdate = true;
   });
 
   // Handle mouse movement
   useEffect(() => {
     const handleMouseMove = (event: MouseEvent) => {
-      // Normalize mouse coords to [-10, 10] range matching lattice scale
-      mouse.current.x = (event.clientX / window.innerWidth) * 20 - 10;
-      mouse.current.y = -(event.clientY / window.innerHeight) * 20 + 10;
+      mouse.current.x = (event.clientX / window.innerWidth) * 20 - 10; // -10 to 10
+      mouse.current.y = -(event.clientY / window.innerHeight) * 20 + 10; // -10 to 10
+      mouse.current.z = 0; // Fixed z-plane for simplicity
     };
 
     window.addEventListener('mousemove', handleMouseMove);
@@ -84,9 +88,15 @@ const CrystalLattice = () => {
   }, []);
 
   return (
-    <lineSegments ref={latticeRef}>
-      <lineBasicMaterial color="#ffffff" opacity={0.2} transparent />
-    </lineSegments>
+    <points ref={particlesRef}>
+      <pointsMaterial
+        color="#ffffff"
+        size={0.1}
+        opacity={0.3}
+        transparent
+        blending={THREE.AdditiveBlending} // For a glowing effect
+      />
+    </points>
   );
 };
 
@@ -97,8 +107,7 @@ const Scene = () => {
       camera={{ position: [0, 0, 10], fov: 75 }}
     >
       <ambientLight intensity={0.5} />
-      <CrystalLattice />
-      <OrbitControls enableZoom={false} enablePan={false} />
+      <ParticleStreams />
     </Canvas>
   );
 };

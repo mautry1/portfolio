@@ -11,14 +11,15 @@ const ParticleStreams = () => {
 
   // Initialize particles with flowing distribution
   useEffect(() => {
+    const aspect = window.innerWidth / window.innerHeight;
+
     for (let i = 0; i < numParticles; i++) {
       // Create streaming bands of particles
-      const band = Math.floor(i / 400) % 5;
       const angle = (i * 0.02) % (Math.PI * 2);
       
-      positions[i * 3] = (Math.sin(angle) * 15) + (band * 4 - 8); // x
+      positions[i * 3] = (Math.random() - 0.5) * aspect * 20; // X-axis
       positions[i * 3 + 1] = (Math.cos(angle) * 10 - 15); // y (flowing downward)
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 20; // z-depth
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 10; // z-depth
 
       // Base velocity for streaming flow
       velocities[i * 3] = Math.sin(angle) * 0.02;
@@ -103,8 +104,14 @@ const ParticleStreams = () => {
 const Scene = () => {
   return (
     <Canvas
-      className="fixed top-0 left-0 w-full h-full -z-10"
-      camera={{ position: [0, 0, 25], fov: 75 }}
+      className="fixed top-0 left-0 w-screen h-screen -z-10"
+      camera={{
+        position: [0, 0, 1],
+        fov: 100,
+        aspect: window.innerWidth / window.innerHeight,
+        near: 0.1,
+        far: 1000
+      }}
     >
       <ambientLight intensity={0.25} />
       <ParticleStreams />

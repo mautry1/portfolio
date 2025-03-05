@@ -39,7 +39,7 @@ const Scene = () => {
 
     // Constants
     const epsilon = 100;
-    const C = 5000;
+    const C = 1000;
     const scale = 10;
     const maxSpeed = 5;
 

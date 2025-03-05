@@ -4,14 +4,19 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --galaxy-bg: radial-gradient(circle at center, #0a0e2a 0%, #000000 100%);
+body {
+  @apply bg-black;
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  overflow: hidden; /* Prevent body scrolling */
+  width: 100vw;
+  height: 100vh;
 }
 
-body {
-  @apply bg-black min-h-screen; /* Solid black to highlight particles */
-  font-family: 'Inter', sans-serif;
-  overflow-x: hidden;
+#root {
+  width: 100vw;
+  height: 100vh;
+  overflow-y: auto; /* Allow content scrolling */
   position: relative;
 }
 

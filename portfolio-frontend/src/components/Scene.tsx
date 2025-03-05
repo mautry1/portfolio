@@ -104,11 +104,9 @@ const ParticleStreams = () => {
 const Scene = () => {
   return (
     <Canvas
-      className="fixed top-0 left-0 w-screen h-screen -z-10"
       camera={{
         position: [0, 0, 1],
         fov: 100,
-        aspect: window.innerWidth / window.innerHeight,
         near: 0.1,
         far: 1000
       }}

@@ -14,14 +14,15 @@ const NotFound = lazy(() => import("./pages/NotFound")); // New 404 page
 const App = () => {
   return (
     <Router>
-      <div className="min-h-screen relative">
+      <div className="fixed top-0 left-0 w-full h-full -z-50">
         {/* 3D Background */}
         <Scene />
-        
+      </div> 
+
         {/* Content Container */}
-        <div className="relative z-10">
+        <div className="relative z-10 h-full">
           <Navbar />
-          <main className="pt-20">
+          <main className="pt-20 h-full">
             <Suspense fallback={<LoadingSpinner />}>
               <Routes>
                 <Route path="/" element={<Home />} />
@@ -33,7 +34,6 @@ const App = () => {
             </Suspense>
           </main>
         </div>
-      </div>
     </Router>
   );
 };

@@ -115,7 +115,7 @@ scheduler.start()
 atexit.register(lambda: scheduler.shutdown())
 
 @app.route('/api/contact', methods=['POST'])
-@limiter.limit("5 per day")  # Gmail has daily limits
+@limiter.limit("5 per day")
 def send_contact_email():
     try:
         data = request.get_json()
@@ -129,7 +129,7 @@ def send_contact_email():
         Email: {data['email']}
         Message: {data['message']}
         """)
-        msg['Subject'] = f"New Contact from {data['name']}"
+        msg['Subject'] = f"New message from {data['name']}"
         msg['From'] = os.getenv('SMTP_FROM')
         msg['To'] = os.getenv('SMTP_TO')
         msg['Date'] = formatdate(localtime=True)

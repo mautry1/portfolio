@@ -1,12 +1,12 @@
 # backend/app.py
 import os
+import atexit
 from datetime import datetime
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from pymongo import MongoClient
 from bson import ObjectId, json_util
-import atexit
 from apscheduler.schedulers.background import BackgroundScheduler
 from pymongo.errors import ConnectionFailure, OperationFailure
 

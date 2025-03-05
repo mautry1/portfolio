@@ -36,8 +36,8 @@ const Projects = () => {
     return (
       <div className="p-8 text-center space-y-4">
         <div className="animate-spin text-4xl">⏳</div>
-        <p className="text-lg">Loading projects...</p>
-        <p className="text-sm text-gray-500">
+        <p className="text-lg text-gray-900 dark:text-gray-100">Loading projects...</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
           This might take up to 1 minute on first load (Render free tier)
         </p>
       </div>
@@ -50,7 +50,7 @@ const Projects = () => {
         <div className="text-red-500 mb-4 text-lg">⚠️ {error}</div>
         <button 
           onClick={() => window.location.reload()}
-          className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
         >
           Try Again
         </button>
@@ -59,14 +59,14 @@ const Projects = () => {
   }
 
   if (!projects.length) {
-    return <div className="p-8 text-center">No projects found.</div>;
+    return <div className="p-8 text-center text-gray-900 dark:text-gray-100">No projects found.</div>;
   }
 
   return (
     <div className="min-h-screen relative">
-      <Scene /> {/* Needle background */}
+      <Scene />
       <div className="relative max-w-7xl mx-auto px-4 py-20">
-        <h1 className="text-5xl font-bold text-center mb-20 bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
+        <h1 className="text-5xl font-bold text-center mb-20 text-gray-900 dark:text-white">
           My Projects
         </h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

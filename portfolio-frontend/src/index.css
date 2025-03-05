@@ -9,36 +9,22 @@
 }
 
 body {
-  @apply bg-black min-h-screen; /* Updated to solid black */
+  @apply bg-black min-h-screen;
   font-family: 'Inter', sans-serif;
   overflow-x: hidden;
   position: relative;
 }
 
 h1, h2, h3 {
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Orbitron', sans-serif; /* Optional: change to 'Inter' for full minimalism */
 }
 
 .glass-effect {
-  @apply backdrop-blur-lg bg-holographic border border-white/10;
-  box-shadow: 0 8px 32px rgba(138,43,226,0.1);
+  @apply backdrop-blur-sm bg-white/80 dark:bg-gray-900/80 border border-gray-200/50 dark:border-gray-700/50 rounded-xl p-6;
 }
 
-.hover-shine {
-  position: relative;
-  overflow: hidden;
-}
-
-.hover-shine::after {
-  content: '';
-  @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent;
-  transform: translateX(-100%);
-  transition: transform 0.6s ease;
-}
-
-.hover-shine:hover::after {
-  transform: translateX(100%);
-}
+/* Remove hover-shine or adjust if you want a subtler version */
+/* .hover-shine { ... } can be removed or commented out */
 
 /* Needle Background Styles */
 .needle-background {
@@ -49,13 +35,12 @@ h1, h2, h3 {
   height: 100vh;
   background: black;
   z-index: -1;
-  pointer-events: none; /* Allows clicks to pass through */
+  pointer-events: none;
 }
 
 .needle {
   position: absolute;
-  width: 2px;
-  height: 100px;
-  background: linear-gradient(to top, rgba(192, 192, 192, 0.2), rgba(192, 192, 192, 0.8));
+  width: 1px;
+  background: linear-gradient(to top, rgba(255,255,255,0.05), rgba(255,255,255,0.1));
   transform-origin: bottom center;
 }

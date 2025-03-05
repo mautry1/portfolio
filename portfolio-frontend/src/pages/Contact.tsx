@@ -1,17 +1,17 @@
 import { motion } from 'framer-motion';
-import { EnvelopeIcon, GlobeAltIcon, PhoneIcon } from '@heroicons/react/24/outline';
+import { EnvelopeIcon, PhoneIcon, GlobeAltIcon } from '@heroicons/react/24/outline';
 import Scene from "../components/Scene";
 
 const Contact = () => {
   return (
     <div className="relative min-h-screen flex items-center justify-center">
-      <Scene /> {/* Needle background */}
+      <Scene />
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="glass-effect p-8 rounded-3xl backdrop-blur-xl w-full max-w-2xl mx-4"
+        className="glass-effect p-8 rounded-3xl w-full max-w-2xl mx-4"
       >
-        <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-8">
+        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-8">
           Let's Connect
         </h1>
 
@@ -21,7 +21,7 @@ const Contact = () => {
               <input
                 type="text"
                 placeholder="Your Name"
-                className="w-full bg-white/5 border border-white/20 rounded-lg px-4 py-3 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-3 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </motion.div>
 
@@ -29,7 +29,7 @@ const Contact = () => {
               <input
                 type="email"
                 placeholder="Email Address"
-                className="w-full bg-white/5 border border-white/20 rounded-lg px-4 py-3 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-3 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </motion.div>
 
@@ -37,14 +37,14 @@ const Contact = () => {
               <textarea
                 placeholder="Your Message"
                 rows={4}
-                className="w-full bg-white/5 border border-white/20 rounded-lg px-4 py-3 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-3 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </motion.div>
 
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="w-full py-3 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg font-semibold text-white hover:shadow-xl transition-all"
+              className="w-full py-3 bg-blue-600 rounded-lg font-semibold text-white hover:bg-blue-700 transition-all"
             >
               Send Message
             </motion.button>
@@ -59,10 +59,10 @@ const Contact = () => {
               <motion.div 
                 key={index}
                 whileHover={{ x: 10 }}
-                className="flex items-center space-x-4 bg-white/5 p-4 rounded-lg border border-white/10"
+                className="flex items-center space-x-4 bg-gray-100 dark:bg-gray-800 p-4 rounded-lg border border-gray-300 dark:border-gray-700"
               >
-                <item.icon className="h-6 w-6 text-purple-400" />
-                <span className="text-gray-200">{item.text}</span>
+                <item.icon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                <span className="text-gray-900 dark:text-gray-100">{item.text}</span>
               </motion.div>
             ))}
           </div>

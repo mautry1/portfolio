@@ -6,8 +6,8 @@ const WaterfallParticles = () => {
   const particlesRef = useRef<THREE.Points>(null!);
   const rocksRef = useRef<THREE.Mesh[]>([]);
   const mouse = useRef({ x: 0, y: 0, z: 0 });
-  const numParticles = 2000; // Dense for waterfall effect
-  const numRocks = 4; // Few rocks as obstacles
+  const numParticles = 5000; // Increased for cascading effect
+  const numRocks = 4;
   const positions = new Float32Array(numParticles * 3);
   const velocities = new Float32Array(numParticles * 3);
 
@@ -15,14 +15,14 @@ const WaterfallParticles = () => {
   useEffect(() => {
     const aspect = window.innerWidth / window.innerHeight;
 
-    // Initialize particles (water droplets)
+    // Initialize particles
     for (let i = 0; i < numParticles; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * aspect * 20; // x: Wide spread
-      positions[i * 3 + 1] = Math.random() * 20 - 10; // y: Start above and flow down
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 10; // z: Depth variation
+      positions[i * 3] = (Math.random() - 0.5) * aspect * 20; // x
+      positions[i * 3 + 1] = Math.random() * 20 - 10; // y: Spread across top
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 10; // z
       velocities[i * 3] = (Math.random() - 0.5) * 0.02; // Slight x drift
-      velocities[i * 3 + 1] = -0.1 - Math.random() * 0.05; // Downward flow
-      velocities[i * 3 + 2] = 0; // No initial z velocity
+      velocities[i * 3 + 1] = -0.15 - Math.random() * 0.05; // Continuous downward flow
+      velocities[i * 3 + 2] = 0;
     }
 
     const geometry = new THREE.BufferGeometry();
@@ -30,39 +30,50 @@ const WaterfallParticles = () => {
     geometry.setAttribute('velocity', new THREE.BufferAttribute(velocities, 3));
     particlesRef.current.geometry = geometry;
 
-    // Initialize rocks with explicit SphereGeometry typing
+    // Initialize rocks with DodecahedronGeometry
     rocksRef.current = Array.from({ length: numRocks }, () => {
       const radius = 0.5 + Math.random() * 0.5; // Size 0.5–1
-      const rockGeometry = new THREE.SphereGeometry(radius, 16, 16);
+      const rockGeometry = new THREE.DodecahedronGeometry(radius, 0); // Faceted shape
       const rock = new THREE.Mesh(
         rockGeometry,
-        new THREE.MeshBasicMaterial({ color: '#666666', opacity: 0.5, transparent: true })
+        new THREE.MeshStandardMaterial({
+          color: '#666666',
+          roughness: 0.8,
+          metalness: 0.2,
+          transparent: true,
+          opacity: 0.7,
+        })
       );
       rock.position.set(
         (Math.random() - 0.5) * aspect * 15,
         (Math.random() - 0.5) * 15,
         (Math.random() - 0.5) * 5
       );
-      // Store radius in userData for later access
-      rock.userData = { radius };
+      rock.userData = { radius }; // Store radius
       return rock;
     });
   }, []);
 
-  // Add rocks to scene
+  // Add rocks and lighting to scene
   useEffect(() => {
     const scene = particlesRef.current.parent;
     if (scene) {
       rocksRef.current.forEach(rock => scene.add(rock));
+      const light = new THREE.PointLight(0xffffff, 0.5, 50);
+      light.position.set(0, 5, 10);
+      scene.add(light);
     }
     return () => {
       if (scene) {
         rocksRef.current.forEach(rock => scene.remove(rock));
+        scene.children.forEach(child => {
+          if (child instanceof THREE.PointLight) scene.remove(child);
+        });
       }
     };
   }, []);
 
-  // Animate particles with flow and obstacles
+  // Animate particles
   useFrame(() => {
     const positions = particlesRef.current.geometry.attributes.position.array as Float32Array;
     const velocities = particlesRef.current.geometry.attributes.velocity.array as Float32Array;
@@ -73,8 +84,8 @@ const WaterfallParticles = () => {
       let y = positions[i3 + 1];
       let z = positions[i3 + 2];
 
-      // Base downward flow
-      velocities[i3 + 1] = Math.max(velocities[i3 + 1], -0.15); // Ensure downward motion
+      // Ensure continuous downward flow
+      velocities[i3 + 1] = Math.max(velocities[i3 + 1], -0.15 - Math.random() * 0.05);
 
       // Rock avoidance
       rocksRef.current.forEach(rock => {
@@ -82,11 +93,11 @@ const WaterfallParticles = () => {
         const dy = y - rock.position.y;
         const dz = z - rock.position.z;
         const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
-        const rockRadius = (rock.userData as { radius: number }).radius + 0.2; // Access stored radius
+        const rockRadius = (rock.userData as { radius: number }).radius + 0.2;
 
         if (distance < rockRadius) {
           const force = (rockRadius - distance) * 0.1;
-          const normalX = dx / distance || 0; // Avoid NaN
+          const normalX = dx / distance || 0;
           const normalY = dy / distance || 0;
           const normalZ = dz / distance || 0;
           velocities[i3] += normalX * force;
@@ -100,11 +111,11 @@ const WaterfallParticles = () => {
       const dyMouse = y - mouse.current.y;
       const dzMouse = z - mouse.current.z;
       const distanceMouse = Math.sqrt(dxMouse * dxMouse + dyMouse * dyMouse + dzMouse * dzMouse);
-      const cursorRadius = 1.5; // Cursor influence radius
+      const cursorRadius = 1.5;
 
       if (distanceMouse < cursorRadius) {
         const force = (cursorRadius - distanceMouse) * 0.05;
-        const normalX = dxMouse / distanceMouse || 0; // Avoid NaN
+        const normalX = dxMouse / distanceMouse || 0;
         const normalY = dyMouse / distanceMouse || 0;
         const normalZ = dzMouse / distanceMouse || 0;
         velocities[i3] += normalX * force;
@@ -112,18 +123,18 @@ const WaterfallParticles = () => {
         velocities[i3 + 2] += normalZ * force;
       }
 
-      // Update positions with damping
-      positions[i3] += velocities[i3] *= 0.98;
-      positions[i3 + 1] += velocities[i3 + 1] *= 0.98;
-      positions[i3 + 2] += velocities[i3 + 2] *= 0.98;
+      // Update positions with reduced damping
+      positions[i3] += velocities[i3] *= 0.995; // Slower damping
+      positions[i3 + 1] += velocities[i3 + 1] *= 0.995;
+      positions[i3 + 2] += velocities[i3 + 2] *= 0.995;
 
-      // Reset particles to top when they fall off
+      // Reset to top for continuous flow
       if (positions[i3 + 1] < -10) {
         positions[i3] = (Math.random() - 0.5) * (window.innerWidth / window.innerHeight) * 20;
-        positions[i3 + 1] = 10 + Math.random() * 5; // Restart above view
+        positions[i3 + 1] = 10 + Math.random() * 5;
         positions[i3 + 2] = (Math.random() - 0.5) * 10;
         velocities[i3] = (Math.random() - 0.5) * 0.02;
-        velocities[i3 + 1] = -0.1 - Math.random() * 0.05;
+        velocities[i3 + 1] = -0.15 - Math.random() * 0.05;
         velocities[i3 + 2] = 0;
       }
     }
@@ -137,7 +148,7 @@ const WaterfallParticles = () => {
       const aspect = window.innerWidth / window.innerHeight;
       mouse.current.x = (event.clientX / window.innerWidth) * aspect * 20 - (aspect * 10);
       mouse.current.y = -(event.clientY / window.innerHeight) * 20 + 10;
-      mouse.current.z = 0; // Fixed z for cursor
+      mouse.current.z = 0;
     };
 
     window.addEventListener('mousemove', handleMouseMove);
@@ -150,7 +161,7 @@ const WaterfallParticles = () => {
         size={0.05}
         transparent
         blending={THREE.AdditiveBlending}
-        color={new THREE.Color(0.5, 0.7, 1.0)} // Soft blue water hue
+        color={new THREE.Color(0.5, 0.7, 1.0)}
         opacity={0.4}
         sizeAttenuation={true}
       />

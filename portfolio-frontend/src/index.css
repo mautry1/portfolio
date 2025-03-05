@@ -23,25 +23,13 @@ h1, h2, h3 {
   @apply backdrop-blur-sm bg-white/80 dark:bg-gray-900/80 border border-gray-200/50 dark:border-gray-700/50 rounded-xl p-6;
 }
 
-/* Remove hover-shine or adjust if you want a subtler version */
-/* .hover-shine { ... } can be removed or commented out */
-
-.prism-background {
+.gravity-background {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: black; /* Matches your original background */
-  z-index: -1; /* Keeps it behind content */
+  background: black;
+  z-index: -1; /* Behind content */
   pointer-events: none; /* Allows clicks to pass through */
-  perspective: 1000px; /* Enables 3D space */
-}
-
-.prism {
-  position: absolute;
-  clip-path: polygon(50% 0%, 0% 100%, 100% 100%); /* Creates a downward triangle */
-  background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.3)); /* Initial gradient */
-  transform-style: preserve-3d; /* Ensures 3D transforms work */
-  transform-origin: center; /* Rotates around the prism's center */
 }
